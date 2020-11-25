@@ -11,6 +11,7 @@
   --blue-hover:#347EFF;
   --blue-default: #2F71E5;
   --blue-active: #2A65CC;
+  --error-color: #FF0000;
   --container-padding: 40px;
 }
 
@@ -34,6 +35,18 @@ body {
 
 #root {
   width: 100%;
+}
+
+.inline-button {
+  background: none;
+  border: none;
+  color: var(--blue-default);
+  cursor: pointer;
+  outline: none;
+  transition: opacity .2s;
+}
+.inline-button:hover {
+  opacity: .6;
 }
 
 @media screen and (max-width: 480px) {
