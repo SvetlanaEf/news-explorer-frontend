@@ -11,7 +11,6 @@ const FORM_TYPE = {
 export default function AuthPopup({ onSignIn, onSignUp, isOpen, onClose }) {
   const [ formType, setFormType ] = useState(FORM_TYPE.SIGN_IN);
   const handleSubmit = (values) => {
-    console.log(values);
     if (formType === FORM_TYPE.SIGN_IN) {
       onSignIn(values);
     } else {
