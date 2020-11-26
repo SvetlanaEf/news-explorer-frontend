@@ -28,7 +28,7 @@ export default function Footer() {
             <li className='footer__social-item'>
               <a
                 className='footer__social-link'
-                href='https://github.com/SvetlanaEf/news-explorer-frontend'
+                href='https://github.com/SvetlanaEf'
                 target='_blank'
                 rel='noreferrer'
               >
@@ -38,7 +38,7 @@ export default function Footer() {
             <li className='footer__social-item'>
               <a
                 className='footer__social-link'
-                href='https://facebook.com'
+                href='https://www.facebook.com/profile.php?id=100058351036256'
                 target='_blank'
                 rel='noreferrer'
               >
