@@ -25,20 +25,8 @@
   color: var(--grey-text);
   cursor: default;
 }
-
 .auth-popup__toggle {
   text-align: center;
   font-size: 14px;
   line-height: 17px;
-}
-.auth-popup__toggle-button {
-  background: none;
-  border: none;
-  color: var(--blue-default);
-  cursor: pointer;
-  outline: none;
-  transition: opacity .2s;
-}
-.auth-popup__toggle-button:hover {
-  opacity: .6;
 }

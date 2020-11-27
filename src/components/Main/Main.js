@@ -45,7 +45,11 @@ export default function Main({ onLogin, onLogout }) {
 
       { (inProgress || !!cards.length) && (
         <section className='main__news-container'>
-          { !!cards.length && <h2 className='main__news-title'>Результаты поиска</h2> }
+          { !!cards.length && (
+            <div className='container'>
+              <h2 className='main__news-title'>Результаты поиска</h2>
+            </div>
+          )}
 
           { !!cards.length && (
               <NewsCardList

@@ -6,6 +6,7 @@ import SavedNews from '../SavedNews/SavedNews'
 import Footer from "../Footer/Footer";
 import AuthPopup from "../AuthPopup/AuthPopup";
 import './App.css';
+import Popup from "../Popup/Popup";
 
 function App() {
   const [ user, setUser ] = useState({
@@ -14,11 +15,12 @@ function App() {
     email: 'ымуедфтф"нфюкг'
   });
   const [ openAuthPopup, setOpenAuthPopup ] = useState(false);
+  const [ openSuccessPopup, setOpenSuccessPopup ] = useState(false);
   const handleSignIn = () => {
 
   };
   const handleSignUp = () => {
-
+    setOpenSuccessPopup(true);
   };
   const handleLogin = () => {
     setOpenAuthPopup(true);
@@ -53,6 +55,20 @@ function App() {
           onSignIn={ handleSignIn }
           onSignUp={ handleSignUp }
         />
+
+        <Popup
+          title='Пользователь успешно зарегистрирован!'
+          isOpen={ openSuccessPopup }
+          onClose={ () => setOpenSuccessPopup(false) }
+        >
+          <button
+            className='inline-button'
+            onClick={ () => {
+              setOpenSuccessPopup(false)
+              handleLogin();
+            } }
+          >Войти</button>
+        </Popup>
       </Router>
     </CurrentUserContext.Provider>
   );
