@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import NewsCard from "../NewsCard/NewsCard";
 import './NewsCardList.css';
 
-export default function NewsCardList({ cards = [], withPagination = false, onDelete }) {
+export default function NewsCardList({ cards = [], withPagination = false, onDeleteCard, onSaveCard }) {
   const [ countShowing, setCountShowing ] = useState(3);
   const articles = withPagination ? cards.slice(0, countShowing) : cards;
 
@@ -13,7 +13,8 @@ export default function NewsCardList({ cards = [], withPagination = false, onDel
           <NewsCard
             key={ cardIndex }
             data={ card }
-            onDelete={ onDelete }
+            onDelete={ onDeleteCard }
+            onSave={ onSaveCard }
           />
         ))}
       </div>

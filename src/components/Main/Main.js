@@ -4,29 +4,51 @@ import './Main.css';
 import SearchForm from "../SearchForm/SearchForm";
 import About from "../About/About";
 import NewsCardList from "../NewsCardList/NewsCardList";
-import { articles } from './mockup.data';
 import Preloader from "../Preloader/Preloader";
+import newsApi from "../../utils/NewsApi";
+import { ReactComponent as EmptyIcon } from '../../images/empty-icon.svg';
+import mainApi from "../../utils/MainApi";
 
 export default function Main({ onLogin, onLogout }) {
   const [ inProgress, setInProgress ] = useState(false);
   const [ cards, setCards ] = useState([]);
-  const handleSearch = (value) => {
-    if (!value) return;
+  const [ isEmptyResponse, setIsEmptyResponse ] = useState(false);
 
+  const handleError = (error) => {
+    console.log(error);
+  }
+  const handleSearch = (keyword) => {
+    if (!keyword) return;
+
+    setCards([]);
+    setIsEmptyResponse(false)
     setInProgress(true);
-
-    setTimeout(() => {
-      setInProgress(false);
-      setCards(articles.map((item) => ({
-        keyword: '',
-        source: item.source.name,
-        title: item.title,
-        text: item.description,
-        date: item.publishedAt,
-        image: item.urlToImage,
-        link: item.url
-      })));
-    }, 3000);
+    newsApi
+      .getEverything(keyword)
+      .then((response => {
+        if (response && response.status === 'ok') {
+          if (response.totalResults) {
+            setCards(
+              response.articles.map((item) => ({
+                keyword,
+                source: item.source.name,
+                title: item.title,
+                text: item.description,
+                date: item.publishedAt,
+                image: item.urlToImage,
+                link: item.url
+              }))
+            );
+          } else {
+            setIsEmptyResponse(true);
+          }
+        }
+      }))
+      .catch(handleError)
+      .finally(() => setInProgress(false));
+  };
+  const handleSaveCard = (card) => {
+    mainApi.saveNews(card).catch(handleError)
   };
 
   return (
@@ -43,7 +65,7 @@ export default function Main({ onLogin, onLogout }) {
         </div>
       </div>
 
-      { (inProgress || !!cards.length) && (
+      { (inProgress || !!cards.length || isEmptyResponse) && (
         <section className='main__news-container'>
           { !!cards.length && (
             <div className='container'>
@@ -54,11 +76,21 @@ export default function Main({ onLogin, onLogout }) {
           { !!cards.length && (
               <NewsCardList
                 cards={ cards }
+                onSaveCard={ handleSaveCard }
                 withPagination
               />
           ) }
 
           { inProgress && <Preloader text='Идет поиск новостей...'/> }
+
+          { isEmptyResponse && (
+            <div className='main__empty'>
+              <EmptyIcon className='main__empty-icon' />
+              <div className='main__empty-title'>Ничего не найдено</div>
+              <p className='main__empty-description'>К сожалению по вашему запросу
+                ничего не найдено.</p>
+            </div>
+          ) }
         </section>
       ) }
       <About/>

@@ -23,9 +23,11 @@ export default function SavedNewsHeader({ keywords = [], countNews = 0 }) {
     <div className='saved-news-header'>
       <div className='saved-news-header__container container'>
         <p className='saved-news-header__pretitle'>Сохранённые статьи</p>
-        <h1 className='saved-news-header__title'>
-          { user.name }, у вас { !countNews ? 'пока нет сохраненных статей' : Plural(countNews, pluralPhrases) }
-        </h1>
+        { user && (
+          <h1 className='saved-news-header__title'>
+            { user.name }, у вас { !countNews ? 'пока нет сохраненных статей' : Plural(countNews, pluralPhrases) }
+          </h1>
+        ) }
         { !!keywords.length && (
           <p className='saved-news-header__tags'>
             По ключевым словам: <b>{ firstWords.join(', ') }</b>

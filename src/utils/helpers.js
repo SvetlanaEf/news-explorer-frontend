@@ -9,3 +9,6 @@ export const Plural = (n, words, hasSpace = true) => {
 
   return hasSpace ? `${n} ${resultWord}` : n + resultWord;
 };
+export function filterUnique(value, index, self) {
+  return self.indexOf(value) === index;
+}

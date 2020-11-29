@@ -1,13 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './Input.css';
 
-export default function Input({ label, onValidate, onChange, visible = true, ...props }) {
+export default function Input({ label, onValidate, onChange, value, visible = true, ...props }) {
   const [ error, setError ] = useState('');
-  const [ value, setValue ] = useState('');
   const inputRef = useRef(null);
   const isValid = !!(inputRef && inputRef.current && inputRef.current.validity.valid);
   const handleChange = ({ target: { value } }) => {
-    setValue(value);
     onChange(props.name, value);
 
     if (!inputRef || !inputRef.current) return;
@@ -22,6 +20,12 @@ export default function Input({ label, onValidate, onChange, visible = true, ...
   useEffect(() => {
     onValidate(props.name, visible ? isValid : true);
   }, [ props.name, visible, onValidate, isValid ]);
+
+  useEffect(() => {
+    if (!value) {
+      setError('');
+    }
+  }, [ value ])
 
   if (!visible) return null;
 

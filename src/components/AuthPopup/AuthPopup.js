@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import PopupWithForm from "../PopupWithForm/PopupWithForm";
 import Input from "../Input/Input";
 import './AuthPopup.css';
@@ -8,7 +8,7 @@ const FORM_TYPE = {
   SIGN_UP: 'sign_up'
 }
 
-export default function AuthPopup({ onSignIn, onSignUp, isOpen, onClose }) {
+export default function AuthPopup({ onSignIn, onSignUp, isOpen, onClose, error }) {
   const [ formType, setFormType ] = useState(FORM_TYPE.SIGN_IN);
   const [ validate, setValidate ] = useState({});
   const [ formValues, setFormValues ] = useState({});
@@ -17,20 +17,8 @@ export default function AuthPopup({ onSignIn, onSignUp, isOpen, onClose }) {
   const isValidate = useMemo(() => {
     return Object.keys(validate).every(key => !!validate[key]);
   }, [ validate ]);
-  const handleClose = () => {
-      onClose();
-      setFormValues({});
-      setValidate({});
-      setFormType(FORM_TYPE.SIGN_IN);
-  }
   const handleSubmit = () => {
-    console.log(formValues)
-    if (isSignIn) {
-      onSignIn(formValues);
-    } else {
-      onSignUp(formValues);
-    }
-    handleClose();
+    (isSignIn ? onSignIn : onSignUp)(formValues);
   };
   const handleToggleForm = () => {
     setFormType(formType === FORM_TYPE.SIGN_IN ? FORM_TYPE.SIGN_UP : FORM_TYPE.SIGN_IN);
@@ -42,12 +30,22 @@ export default function AuthPopup({ onSignIn, onSignUp, isOpen, onClose }) {
     setFormValues(prev => ({ ...prev, [name]: value }));
   }, [ setFormValues ]);
 
+  useEffect(() => {
+    setFormType(FORM_TYPE.SIGN_IN);
+  }, [ isOpen ]);
+
+  useEffect(() => {
+    console.log('change form type')
+    setFormValues({});
+    setValidate({});
+  }, [ formType ]);
+
   return (
     <PopupWithForm
       className='auth-popup'
       title={ isSignIn ? 'Вход' : 'Регистрация' }
       isOpen={ isOpen }
-      onClose={ handleClose }
+      onClose={ onClose }
       onSubmit={ handleSubmit }
     >
       <Input
@@ -59,6 +57,7 @@ export default function AuthPopup({ onSignIn, onSignUp, isOpen, onClose }) {
         name='email'
         onValidate={ handleValidate }
         onChange={ handleChange }
+        value={ formValues.email || '' }
       />
 
       <Input
@@ -71,6 +70,7 @@ export default function AuthPopup({ onSignIn, onSignUp, isOpen, onClose }) {
         name='password'
         onValidate={ handleValidate }
         onChange={ handleChange }
+        value={ formValues.password || '' }
       />
 
       <Input
@@ -84,8 +84,10 @@ export default function AuthPopup({ onSignIn, onSignUp, isOpen, onClose }) {
         onValidate={ handleValidate }
         onChange={ handleChange }
         visible={ isSignUp }
+        value={ formValues.name || '' }
       />
 
+      { error && <p className='auth-popup__error'>{ error }</p> }
       <button
         className='auth-popup__submit'
         disabled={ !isValidate }

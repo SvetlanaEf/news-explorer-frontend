@@ -10,7 +10,7 @@ import './NewsCard.css';
 export default function NewsCard({ data, onSave = () => {}, onDelete = () => {} }) {
   const [ isActive, setIsActive ] = useState(false);
   const user = useContext(CurrentUserContext);
-  const isOwn = data.owner === user._id;
+  const isOwn = user && data.owner === user._id;
   const buttonRef = useRef(null)
   const handleSave = () => {
     setIsActive(!isActive);
