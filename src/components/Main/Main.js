@@ -8,14 +8,18 @@ import Preloader from "../Preloader/Preloader";
 import newsApi from "../../utils/NewsApi";
 import { ReactComponent as EmptyIcon } from '../../images/empty-icon.svg';
 import mainApi from "../../utils/MainApi";
+import ErrorPopup from "../ErrorPopup/ErrrorPopup";
 
 export default function Main({ onLogin, onLogout }) {
   const [ inProgress, setInProgress ] = useState(false);
   const [ cards, setCards ] = useState([]);
   const [ isEmptyResponse, setIsEmptyResponse ] = useState(false);
+  const [ error, setError ] = useState('');
 
   const handleError = (error) => {
-    console.log(error);
+    if (error && error.message) {
+      setError(error.message);
+    }
   }
   const handleSearch = (keyword) => {
     if (!keyword) return;
@@ -95,6 +99,10 @@ export default function Main({ onLogin, onLogout }) {
       ) }
       <About/>
 
+      <ErrorPopup
+        isOpen={ !!error }
+        onClose={ () => setError('') }
+      >{ error }</ErrorPopup>
     </div>
   )
 }

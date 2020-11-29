@@ -6,13 +6,17 @@ import Preloader from "../Preloader/Preloader";
 import './SavedNews.css';
 import mainApi from "../../utils/MainApi";
 import { filterUnique } from "../../utils/helpers";
+import ErrorPopup from "../ErrorPopup/ErrrorPopup";
 
 export default function SavedNews({ onLogin, onLogout }) {
   const [ cards, setCards ] = useState([]);
   const [ inProgress, setInProgress ] = useState(true);
+  const [ error, setError ] = useState('');
 
   const handleError = (error) => {
-    console.log(error);
+    if (error && error.message) {
+      setError(error.message);
+    }
   }
   const handleDeleteNews = (news) => {
     mainApi.deleteNews(news._id)
@@ -53,6 +57,11 @@ export default function SavedNews({ onLogin, onLogout }) {
           { inProgress && <Preloader text='Идет загрузка сохраненных статей...'/> }
         </section>
       ) }
+
+      <ErrorPopup
+        isOpen={ !!error }
+        onClose={ () => setError('') }
+      >{ error }</ErrorPopup>
     </div>
   );
 }
