@@ -2,7 +2,7 @@
 
 Фронтенд для проекта news-explorer от Яндекс.Практикум.
 
-###Ссылки
+### Ссылки
 * Приложение: https://explorer-news.tk/ (84.201.161.31)
 * API: https://api.explorer-news.tk/ (84.201.161.31)
 
