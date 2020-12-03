@@ -26,6 +26,9 @@
   margin-right: 32px;
 }
 .header__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   height: 48px;
   padding: 0 20px;
   background: transparent;
@@ -36,6 +39,8 @@
   font-size: 18px;
   line-height: 24px;
   color: var(--light-text);
+  text-transform: capitalize;
+  text-align: center;
   transition: color .2s, border-color .2s;
   cursor: pointer;
   outline: none;
@@ -43,6 +48,16 @@
 .header__button:hover {
   color: var(--grey-text);
   border-color: var(--grey-text);
+}
+.header__button-icon {
+  margin-left: 4px;
+}
+.header__button-icon path {
+  fill: var(--light-text);
+  transition: fill .2s;
+}
+.header__button:hover .header__button-icon path {
+  fill: var(--grey-text);
 }
 .header__burger {
   position: relative;
@@ -96,6 +111,9 @@
 .header_dark .header__burger:after,
 .header_dark .header__burger:before {
   background-color: var(--dark-text);
+}
+.header_dark .header__button-icon path {
+  fill: var(--dark-text);
 }
 
 @media screen and (max-width: 992px) {

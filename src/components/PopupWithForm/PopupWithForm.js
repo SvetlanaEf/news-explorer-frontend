@@ -1,10 +1,21 @@
 import React from 'react';
 import Popup from "../Popup/Popup";
 
-export default function PopupWithForm({ title, isOpen, onClose, onSubmit, children }) {
+export default function PopupWithForm({ title, isOpen, onClose, onSubmit, children, validationSchema }) {
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit();
+
+    if (e.target.elements) {
+      const values = {};
+
+      Array.from(e.target.elements).forEach(element => {
+        if (element.name) {
+          values[element.name] = element.value;
+        }
+      })
+
+      onSubmit(values);
+    }
   };
 
   return (

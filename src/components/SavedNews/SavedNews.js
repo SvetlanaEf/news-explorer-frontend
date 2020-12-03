@@ -1,24 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { articles } from "./mockup.data";
 import Header from "../Header/Header";
 import SavedNewsHeader from "../SavedNewsHeader/SavedNewsHeader";
 import NewsCardList from "../NewsCardList/NewsCardList";
 import Preloader from "../Preloader/Preloader";
+import mainApi from "../../utils/MainApi";
+import { filterUnique } from "../../utils/helpers";
+import ErrorPopup from "../ErrorPopup/ErrrorPopup";
 import './SavedNews.css';
 
 export default function SavedNews({ onLogin, onLogout }) {
   const [ cards, setCards ] = useState([]);
   const [ inProgress, setInProgress ] = useState(true);
+  const [ error, setError ] = useState('');
 
+  const handleError = (error) => {
+    if (error && error.message) {
+      setError(error.message);
+    }
+  }
   const handleDeleteNews = (news) => {
-    console.log('delete', news);
+    mainApi.deleteNews(news._id)
+      .then(() => setCards(cards.filter(({ _id }) => _id !== news._id)))
+      .catch(handleError);
   }
 
   useEffect(() => {
-    setTimeout(() => {
-      setCards(articles);
-      setInProgress(false);
-    }, 2000);
+    mainApi.getSavedNews()
+      .then(response => {
+        if (response && response.data) {
+          setCards(response.data);
+        }
+      })
+      .catch(handleError)
+      .finally(() => setInProgress(false));
   }, []);
 
   return (
@@ -30,17 +44,24 @@ export default function SavedNews({ onLogin, onLogout }) {
       />
 
       <SavedNewsHeader
-        keywords={ cards.map(({ keyword }) => keyword) }
+        keywords={ cards.map(({ keyword }) => keyword).filter(filterUnique) }
         countNews={ cards.length }
       />
 
-      <section className='saved-news__cards'>
-        <div className='saved-news__cards-grid'>
-          <NewsCardList cards={ cards } onDelete={ handleDeleteNews } />
-        </div>
+      { (inProgress || !!cards.length) && (
+        <section className='saved-news__cards'>
+          <div className='saved-news__cards-grid'>
+            <NewsCardList cards={ cards } onDeleteCard={ handleDeleteNews } />
+          </div>
 
-        { inProgress && <Preloader text='Идет загрузка сохраненных статей...'/> }
-      </section>
+          { inProgress && <Preloader text='Идет загрузка сохраненных статей...'/> }
+        </section>
+      ) }
+
+      <ErrorPopup
+        isOpen={ !!error }
+        onClose={ () => setError('') }
+      >{ error }</ErrorPopup>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 .input {
+  position: relative;
   display: flex;
   flex-direction: column;
   margin-bottom: 30px;
@@ -22,4 +23,12 @@
 }
 .input__field::placeholder {
   color: rgba(0,0,0,.2);
+}
+.input__error {
+  position: absolute;
+  top: 100%;
+  padding-top: 3px;
+  color: var(--error-color);
+  font-size: 12px;
+  line-height: 15px;
 }

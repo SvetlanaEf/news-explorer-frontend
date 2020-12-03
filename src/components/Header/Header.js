@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import Navigation from "../Navigation/Navigation";
+import { CurrentUserContext } from "../../contexts/CurrentUserContext";
+import { ReactComponent as LogoutIcon } from '../../images/logout.svg';
 import './Header.css';
 
 export default function Header({ onLogin, onLogout, mode = 'light' }) {
   const [ opened, setOpened ] = useState(false);
+  const user = useContext(CurrentUserContext);
+  const loggedIn = !!user;
 
   return (
     <header className={ `header header_${ mode } ${opened ? 'header_opened' : ''}` }>
@@ -11,14 +15,20 @@ export default function Header({ onLogin, onLogout, mode = 'light' }) {
         <a className='header__logo' href="/">NewsExplorer</a>
 
         <div className='header__navigation'>
-          <Navigation/>
+          <Navigation />
           <button
             className='header__button'
             onClick={()  => {
-              setOpened(false);
-              onLogin();
+              if (loggedIn) {
+                onLogout();
+              } else {
+                setOpened(false);
+                onLogin();
+              }
             }}
-          >Авторизоваться
+          >
+            { loggedIn ? user.name : 'Авторизоваться'}
+            { loggedIn &&  <LogoutIcon className='header__button-icon' />}
           </button>
         </div>
 

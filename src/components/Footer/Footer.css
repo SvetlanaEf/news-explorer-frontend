@@ -4,6 +4,7 @@
 .footer__container {
   display: flex;
   align-items: center;
+  height: 64px;
 }
 .footer__copyrights {
   margin: 0;
@@ -14,7 +15,7 @@
 .footer__links-container {
   display: flex;
   align-items: center;
-  margin: auto;
+  margin-left: auto;
 }
 .footer__links {
   display: flex;
@@ -61,6 +62,7 @@
     padding-bottom: 16px;
   }
   .footer__container {
+    height: unset;
     flex-direction: column-reverse;
     align-items: flex-start;
   }

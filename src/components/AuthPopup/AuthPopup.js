@@ -1,31 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import PopupWithForm from "../PopupWithForm/PopupWithForm";
 import Input from "../Input/Input";
 import './AuthPopup.css';
 
-const FORM_TYPE = {
+export const FORM_TYPE = {
   SIGN_IN: 'sign_in',
   SIGN_UP: 'sign_up'
 }
 
-export default function AuthPopup({ onSignIn, onSignUp, isOpen, onClose }) {
-  const [ formType, setFormType ] = useState(FORM_TYPE.SIGN_IN);
-  const handleSubmit = (values) => {
-    console.log(values);
-    if (formType === FORM_TYPE.SIGN_IN) {
-      onSignIn(values);
-    } else {
-      onSignUp(values);
-    }
+export default function AuthPopup({ onSignIn, onSignUp, isOpen, onClose, error, formType = FORM_TYPE.SIGN_IN, inProgress = false }) {
+  const [ validate, setValidate ] = useState({});
+  const [ formValues, setFormValues ] = useState({});
+  const isSignIn = useMemo(() => formType && formType === FORM_TYPE.SIGN_IN, [ formType ]);
+  const isSignUp = useMemo(() => formType && formType === FORM_TYPE.SIGN_UP, [ formType ]);
+  const isValidate = useMemo(() => {
+    return Object.keys(validate).every(key => !!validate[key]);
+  }, [ validate ]);
+  const handleSubmit = () => {
+    (isSignIn ? onSignIn : onSignUp)(formValues);
   };
   const handleToggleForm = () => {
-      setFormType(formType === FORM_TYPE.SIGN_IN ? FORM_TYPE.SIGN_UP : FORM_TYPE.SIGN_IN);
+    window.location.hash = formType === FORM_TYPE.SIGN_IN ? FORM_TYPE.SIGN_UP : FORM_TYPE.SIGN_IN;
   }
+  const handleValidate = useCallback((name, isValid) => {
+    setValidate(prev => ({ ...prev, [name]: isValid }));
+  }, [ setValidate ]);
+  const handleChange = useCallback((name, value) => {
+    setFormValues(prev => ({ ...prev, [name]: value }));
+  }, [ setFormValues ]);
+
+  // useEffect(() => {
+  //   window.location.hash = FORM_TYPE.SIGN_IN;
+  // }, [ isOpen ]);
+
+  useEffect(() => {
+    setFormValues({});
+    setValidate({});
+  }, [ formType ]);
 
   return (
     <PopupWithForm
       className='auth-popup'
-      title={ formType === FORM_TYPE.SIGN_IN ? 'Вход' : 'Регистрация' }
+      title={ isSignIn ? 'Вход' : 'Регистрация' }
       isOpen={ isOpen }
       onClose={ onClose }
       onSubmit={ handleSubmit }
@@ -35,6 +51,12 @@ export default function AuthPopup({ onSignIn, onSignUp, isOpen, onClose }) {
         type='email'
         label='Email'
         placeholder='Введите почту'
+        required
+        name='email'
+        disabled={ inProgress }
+        onValidate={ handleValidate }
+        onChange={ handleChange }
+        value={ formValues.email || '' }
       />
 
       <Input
@@ -42,27 +64,43 @@ export default function AuthPopup({ onSignIn, onSignUp, isOpen, onClose }) {
         type='password'
         label='Пароль'
         placeholder='Введите пароль'
+        minLength={ 8 }
+        required
+        name='password'
+        disabled={ inProgress }
+        onValidate={ handleValidate }
+        onChange={ handleChange }
+        value={ formValues.password || '' }
       />
 
-      { formType === FORM_TYPE.SIGN_UP && (
-        <Input
-          className='auth-popup__field'
-          label='Имя'
-          placeholder='Введите своё имя'
-        />
-      ) }
+      <Input
+        className='auth-popup__field'
+        label='Имя'
+        placeholder='Введите своё имя'
+        minLength={ 2 }
+        maxLength={ 40 }
+        required
+        name='name'
+        disabled={ inProgress }
+        onValidate={ handleValidate }
+        onChange={ handleChange }
+        visible={ isSignUp }
+        value={ formValues.name || '' }
+      />
 
+      { error && <p className='auth-popup__error'>{ error }</p> }
       <button
         className='auth-popup__submit'
-        disabled
+        disabled={ !isValidate }
         type='submit'
-      >{ formType === FORM_TYPE.SIGN_IN ? 'Войти' : 'Зарегистрироваться' }</button>
+      >{ isSignIn ? 'Войти' : 'Зарегистрироваться' }</button>
 
       <div className='auth-popup__toggle'>
         <span className='auth-popup__toggle-text'>или <button
-          className='auth-popup__toggle-button'
+          className='inline-button'
           onClick={ handleToggleForm }
-        >{ formType === FORM_TYPE.SIGN_IN ? 'Зарегистрироваться' : 'Войти' }</button></span>
+          type='button'
+        >{ isSignIn ? 'Зарегистрироваться' : 'Войти' }</button></span>
       </div>
     </PopupWithForm>
   )
