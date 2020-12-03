@@ -3,10 +3,10 @@ import Header from "../Header/Header";
 import SavedNewsHeader from "../SavedNewsHeader/SavedNewsHeader";
 import NewsCardList from "../NewsCardList/NewsCardList";
 import Preloader from "../Preloader/Preloader";
-import './SavedNews.css';
 import mainApi from "../../utils/MainApi";
 import { filterUnique } from "../../utils/helpers";
 import ErrorPopup from "../ErrorPopup/ErrrorPopup";
+import './SavedNews.css';
 
 export default function SavedNews({ onLogin, onLogout }) {
   const [ cards, setCards ] = useState([]);

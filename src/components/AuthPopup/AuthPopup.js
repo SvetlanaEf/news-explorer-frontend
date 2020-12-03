@@ -3,17 +3,16 @@ import PopupWithForm from "../PopupWithForm/PopupWithForm";
 import Input from "../Input/Input";
 import './AuthPopup.css';
 
-const FORM_TYPE = {
+export const FORM_TYPE = {
   SIGN_IN: 'sign_in',
   SIGN_UP: 'sign_up'
 }
 
-export default function AuthPopup({ onSignIn, onSignUp, isOpen, onClose, error }) {
-  const [ formType, setFormType ] = useState(FORM_TYPE.SIGN_IN);
+export default function AuthPopup({ onSignIn, onSignUp, isOpen, onClose, error, formType = FORM_TYPE.SIGN_IN, inProgress = false }) {
   const [ validate, setValidate ] = useState({});
   const [ formValues, setFormValues ] = useState({});
-  const isSignIn = useMemo(() => formType === FORM_TYPE.SIGN_IN, [ formType ]);
-  const isSignUp = useMemo(() => formType === FORM_TYPE.SIGN_UP, [ formType ]);
+  const isSignIn = useMemo(() => formType && formType === FORM_TYPE.SIGN_IN, [ formType ]);
+  const isSignUp = useMemo(() => formType && formType === FORM_TYPE.SIGN_UP, [ formType ]);
   const isValidate = useMemo(() => {
     return Object.keys(validate).every(key => !!validate[key]);
   }, [ validate ]);
@@ -21,7 +20,7 @@ export default function AuthPopup({ onSignIn, onSignUp, isOpen, onClose, error }
     (isSignIn ? onSignIn : onSignUp)(formValues);
   };
   const handleToggleForm = () => {
-    setFormType(formType === FORM_TYPE.SIGN_IN ? FORM_TYPE.SIGN_UP : FORM_TYPE.SIGN_IN);
+    window.location.hash = formType === FORM_TYPE.SIGN_IN ? FORM_TYPE.SIGN_UP : FORM_TYPE.SIGN_IN;
   }
   const handleValidate = useCallback((name, isValid) => {
     setValidate(prev => ({ ...prev, [name]: isValid }));
@@ -30,9 +29,9 @@ export default function AuthPopup({ onSignIn, onSignUp, isOpen, onClose, error }
     setFormValues(prev => ({ ...prev, [name]: value }));
   }, [ setFormValues ]);
 
-  useEffect(() => {
-    setFormType(FORM_TYPE.SIGN_IN);
-  }, [ isOpen ]);
+  // useEffect(() => {
+  //   window.location.hash = FORM_TYPE.SIGN_IN;
+  // }, [ isOpen ]);
 
   useEffect(() => {
     console.log('change form type')
@@ -55,6 +54,7 @@ export default function AuthPopup({ onSignIn, onSignUp, isOpen, onClose, error }
         placeholder='Введите почту'
         required
         name='email'
+        disabled={ inProgress }
         onValidate={ handleValidate }
         onChange={ handleChange }
         value={ formValues.email || '' }
@@ -68,6 +68,7 @@ export default function AuthPopup({ onSignIn, onSignUp, isOpen, onClose, error }
         minLength={ 8 }
         required
         name='password'
+        disabled={ inProgress }
         onValidate={ handleValidate }
         onChange={ handleChange }
         value={ formValues.password || '' }
@@ -81,6 +82,7 @@ export default function AuthPopup({ onSignIn, onSignUp, isOpen, onClose, error }
         maxLength={ 40 }
         required
         name='name'
+        disabled={ inProgress }
         onValidate={ handleValidate }
         onChange={ handleChange }
         visible={ isSignUp }

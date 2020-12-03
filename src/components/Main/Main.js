@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from "../Header/Header";
 import './Main.css';
 import SearchForm from "../SearchForm/SearchForm";
@@ -10,7 +10,7 @@ import { ReactComponent as EmptyIcon } from '../../images/empty-icon.svg';
 import mainApi from "../../utils/MainApi";
 import ErrorPopup from "../ErrorPopup/ErrrorPopup";
 
-export default function Main({ onLogin, onLogout }) {
+export default function Main({ onLogin, onLogout, storageArticles }) {
   const [ inProgress, setInProgress ] = useState(false);
   const [ cards, setCards ] = useState([]);
   const [ isEmptyResponse, setIsEmptyResponse ] = useState(false);
@@ -32,17 +32,18 @@ export default function Main({ onLogin, onLogout }) {
       .then((response => {
         if (response && response.status === 'ok') {
           if (response.totalResults) {
-            setCards(
-              response.articles.map((item) => ({
-                keyword,
-                source: item.source.name,
-                title: item.title,
-                text: item.description,
-                date: item.publishedAt,
-                image: item.urlToImage,
-                link: item.url
-              }))
-            );
+            const articles = response.articles.map((item) => ({
+              keyword,
+              source: item.source.name,
+              title: item.title,
+              text: item.description,
+              date: item.publishedAt,
+              image: item.urlToImage,
+              link: item.url
+            }));
+
+            localStorage.setItem('articles', JSON.stringify(articles));
+            setCards(articles);
           } else {
             setIsEmptyResponse(true);
           }
@@ -52,8 +53,24 @@ export default function Main({ onLogin, onLogout }) {
       .finally(() => setInProgress(false));
   };
   const handleSaveCard = (card) => {
-    mainApi.saveNews(card).catch(handleError)
+    mainApi.saveNews(card)
+      .then(() => {
+          setCards(cards.map(item => {
+            if (item.link === card.link) {
+              item.saved = true;
+            }
+
+            return item;
+          }))
+      })
+      .catch(handleError)
   };
+
+  useEffect(() => {
+    if (storageArticles && storageArticles.length && !cards.length) {
+      setCards(storageArticles);
+    }
+  }, [ storageArticles, cards ]);
 
   return (
     <div className='main'>

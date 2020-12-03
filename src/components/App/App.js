@@ -4,41 +4,48 @@ import { CurrentUserContext } from "../../contexts/CurrentUserContext";
 import Main from '../Main/Main';
 import SavedNews from '../SavedNews/SavedNews'
 import Footer from "../Footer/Footer";
-import AuthPopup from "../AuthPopup/AuthPopup";
+import AuthPopup, { FORM_TYPE } from "../AuthPopup/AuthPopup";
 import './App.css';
 import Popup from "../Popup/Popup";
 import mainApi from "../../utils/MainApi";
+import ProtectedRoute from "../ProtectedRoute/ProtectedRoute";
 
 function App() {
   const [ user, setUser ] = useState(null);
-  const [ openAuthPopup, setOpenAuthPopup ] = useState(false);
+  const [ inProgress, setInProgress ] = useState(false);
+  const [ openedForm, setOpenedForm ] = useState(null);
   const [ openSuccessPopup, setOpenSuccessPopup ] = useState(false);
   const [ authError, setAuthError ] = useState('');
+  const [ storageArticles, setStorageArticles ] = useState([]);
   const history = useHistory();
 
   const handleSignIn = (form) => {
     setAuthError('');
+    setInProgress(true);
     mainApi.signIn(form)
       .then(response => {
         if (response.token) {
           localStorage.setItem('token', response.token);
           getCurrentUser();
-          setOpenAuthPopup(false);
+          closeAllPopup();
         }
       })
-      .catch(handleAuthError);
+      .catch(handleAuthError)
+      .finally(() => setInProgress(false));
   };
   const handleSignUp = (form) => {
     setAuthError('');
+    setInProgress(true);
     mainApi.signUp(form)
       .then(() => {
-        setOpenAuthPopup(false);
+        closeAllPopup();
         setOpenSuccessPopup(true);
       })
       .catch(handleAuthError)
+      .finally(() => setInProgress(false));
   };
   const handleLogin = () => {
-    setOpenAuthPopup(true);
+    window.location.hash = FORM_TYPE.SIGN_IN;
   }
   const handleLogout = () => {
     setUser(null);
@@ -57,20 +64,53 @@ function App() {
       .then(response => setUser(response.data))
       .catch(handleLogout);
   };
+  const checkHashChange = () => {
+    const isOpenSignIn = window.location.hash.includes(FORM_TYPE.SIGN_IN) && openedForm !== FORM_TYPE.SIGN_IN;
+    const isOpenSignUp = window.location.hash.includes(FORM_TYPE.SIGN_UP) && openedForm !== FORM_TYPE.SIGN_UP;
+    const opened = isOpenSignIn
+      ? FORM_TYPE.SIGN_IN
+      : isOpenSignUp
+        ? FORM_TYPE.SIGN_UP
+        : null;
+
+    setOpenedForm(opened);
+  }
+  const closeAllPopup = () => {
+    window.location.hash = '';
+  };
 
   useEffect(getCurrentUser, []);
+
+  useEffect(() => {
+    checkHashChange();
+    window.addEventListener('hashchange', checkHashChange);
+
+    try {
+      let articles = localStorage.getItem('articles');
+
+      if (articles) {
+        articles = JSON.parse(articles);
+        setStorageArticles(articles);
+      }
+    } catch (e) {
+      console.error(e)
+    }
+
+    return () => window.removeEventListener('hashchange', checkHashChange);
+  }, []);
 
   return (
     <CurrentUserContext.Provider value={ user }>
       <Switch>
-        <Route path='/saved-news'>
+        <ProtectedRoute path='/saved-news' loggedIn={ !!user } onRedirect={ handleLogin } >
           <SavedNews
             onLogin={ handleLogin }
             onLogout={ handleLogout }
           />
-        </Route>
+        </ProtectedRoute>
         <Route path='/'>
           <Main
+            storageArticles={ storageArticles }
             onLogin={ handleLogin }
             onLogout={ handleLogout }
           />
@@ -80,8 +120,10 @@ function App() {
       <Footer/>
 
       <AuthPopup
-        isOpen={ openAuthPopup }
-        onClose={ () => setOpenAuthPopup(false) }
+        isOpen={ !!openedForm }
+        inProgress={ inProgress }
+        formType={ openedForm }
+        onClose={ closeAllPopup }
         onSignIn={ handleSignIn }
         onSignUp={ handleSignUp }
         error={ authError }
