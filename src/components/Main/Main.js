@@ -24,6 +24,7 @@ export default function Main({ onLogin, onLogout, storageArticles }) {
   const handleSearch = (keyword) => {
     if (!keyword) return;
 
+    localStorage.removeItem('articles');
     setCards([]);
     setIsEmptyResponse(false)
     setInProgress(true);
@@ -67,7 +68,7 @@ export default function Main({ onLogin, onLogout, storageArticles }) {
   };
 
   useEffect(() => {
-    if (storageArticles && storageArticles.length && !cards.length) {
+    if (storageArticles && storageArticles.length && !cards.length && !inProgress) {
       setCards(storageArticles);
     }
   }, [ storageArticles, cards ]);

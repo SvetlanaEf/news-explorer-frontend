@@ -102,12 +102,14 @@ function App() {
   return (
     <CurrentUserContext.Provider value={ user }>
       <Switch>
-        <ProtectedRoute path='/saved-news' loggedIn={ !!user } onRedirect={ handleLogin } >
-          <SavedNews
-            onLogin={ handleLogin }
-            onLogout={ handleLogout }
-          />
-        </ProtectedRoute>
+        <ProtectedRoute
+          path='/saved-news'
+          loggedIn={ !!user }
+          onRedirect={ handleLogin }
+          component={SavedNews}
+          onLogin={ handleLogin }
+          onLogout={ handleLogout }
+        />
         <Route path='/'>
           <Main
             storageArticles={ storageArticles }

@@ -34,7 +34,6 @@ export default function AuthPopup({ onSignIn, onSignUp, isOpen, onClose, error, 
   // }, [ isOpen ]);
 
   useEffect(() => {
-    console.log('change form type')
     setFormValues({});
     setValidate({});
   }, [ formType ]);
